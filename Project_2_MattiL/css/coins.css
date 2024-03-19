@@ -1,0 +1,84 @@
+/* * {
+    text-align: center;
+}
+
+.card {
+    text-align: start;
+} */
+
+#spinnerDiv {
+    position: fixed;
+    z-index: 666;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    /* z-index: -555; */
+    align-items: center; 
+    visibility:hidden;
+    /* display: none; */
+}
+
+#spinner{
+    width: 200px;
+    height: 200px;
+}
+
+/* Spinner */
+/* #spinnerDiv { 
+    display: none;
+}
+#spinnerBtn{
+    display: none;
+}
+#spinner{
+    display: none;
+} */
+
+/* Header*/
+#headerDiv{
+    border-bottom: solid black 3px;
+}
+#cryptoPic{
+    background-image: url("/project_02/images/cryptoPic.jpeg");
+    /* margin-bottom: -5rem; */
+    /* background-size: cover; */
+    height: 100px;
+    width: 200px;
+    /* background-size: cover; */
+    /* border-bottom: solid black 3px; */
+    position: absolute;
+    right: 0;
+    border-bottom: solid black 3px;
+}
+#pictureBorder{
+    border-left: solid black 3px;
+    position: absolute;
+    top: 50%;
+    bottom: 0;
+    left: 0;
+}
+
+/* Parralax */
+.parallax {
+    min-height: 35vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-image: url("/project_02/images/cryptoParralax.jpg");
+}
+
+/* Modal */
+.modal-content{
+    text-align: center;
+}
+.modal-title{
+    margin-left: 45%;
+}
+.modal-title-picked{
+    margin-left: auto;
+    margin-right: auto;
+}
+/* .pickedXBtn{
+    margin-left: 30%;
+} */
