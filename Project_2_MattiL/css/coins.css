@@ -1,11 +1,6 @@
-/* * {
-    text-align: center;
-}
+        /* Coin Project CSS */
 
-.card {
-    text-align: start;
-} */
-
+/* Spinner */
 #spinnerDiv {
     position: fixed;
     z-index: 666;
@@ -13,50 +8,25 @@
     right: 0;
     top: 0;
     bottom: 0;
-    /* z-index: -555; */
     align-items: center; 
     visibility:hidden;
-    /* display: none; */
 }
-
 #spinner{
     width: 200px;
     height: 200px;
 }
 
-/* Spinner */
-/* #spinnerDiv { 
-    display: none;
-}
-#spinnerBtn{
-    display: none;
-}
-#spinner{
-    display: none;
-} */
-
 /* Header*/
 #headerDiv{
-    border-bottom: solid black 3px;
+    border-bottom: solid black 1px;
 }
 #cryptoPic{
-    background-image: url("/project_02/images/cryptoPic.jpeg");
-    /* margin-bottom: -5rem; */
-    /* background-size: cover; */
+    background-image: url("../images/cryptoPic.jpeg");
     height: 100px;
     width: 200px;
-    /* background-size: cover; */
-    /* border-bottom: solid black 3px; */
     position: absolute;
     right: 0;
-    border-bottom: solid black 3px;
-}
-#pictureBorder{
-    border-left: solid black 3px;
-    position: absolute;
-    top: 50%;
-    bottom: 0;
-    left: 0;
+    margin-bottom: 5rem;
 }
 
 /* Parralax */
@@ -65,7 +35,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    background-image: url("/project_02/images/cryptoParralax.jpg");
+    background-image: url("../images/cryptoParralax.jpg");
 }
 
 /* Modal */
@@ -79,6 +49,16 @@
     margin-left: auto;
     margin-right: auto;
 }
-/* .pickedXBtn{
-    margin-left: 30%;
-} */
+
+/* Live Report Page */
+#liveReports{
+    text-align: center;
+}
+
+/* About Page */
+.logoImages {
+    max-width: 100px;
+}
+.myPic{
+    max-width: 80%;
+}

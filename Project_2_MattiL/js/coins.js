@@ -1,4 +1,54 @@
 $(()=>{
+
+    // Navigation Bar Handling Logic
+// changePage = () => {
+// if #homeButton clicked => innerHTML -> div #coinsHomeDiv === showCoins() <- inject data from "allCryptoCoins" Array
+// if #liveButton clicked => innerHTML -> div #chartContainer <- inject data from "pickedCoins" Array
+// if #aboutButton clicked => innerHTML -> div #about = ABOUT ME PAGE
+// };
+
+// Navigation Click Event
+$("#homeButton,#liveButton,#aboutButton").on("click", (pickedBtn)=>{
+    changePage(pickedBtn.target.id);  // btnID
+    // console.log("Response: ",pickedBtn.target.id) <- Button Id
+    // console.log("clicked: ",$(this)); <- Window Event
+})
+
+// Navigation Handling
+changePage = (btnID) => {
+    // console.log("clicked: ",btnID);
+    switch (btnID) {
+        case ("homeButton"):
+            // console.log("clicked - homeButton: ",btnID);
+            $("#mainDiv").html(`
+                <div id="coinsHomeDiv">
+                    <div class="row justify-content-center" id="coinsHomeDivRow">
+                        <!-- Coins -->
+                    </div>
+                </div>
+            `);
+            showCoins();
+            break;
+        case ("liveButton"):
+            // console.log("clicked - liveButton: ",btnID);
+            // Live Data Page Loading.....
+            $("#mainDiv").html(`
+                <div id="liveReports">
+                <h3>Live Reports Section</h3>
+                <hr>
+                <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+                </div>
+            `);
+            liveDataChartPage(selectedCoins);
+            // liveDataChartPage ();
+            break;
+        case ("aboutButton"):
+            // console.log("clicked - aboutButton: ",btnID);               
+            $("#mainDiv").html(aboutMe);
+            // aboutMePage();
+    }
+};
+
 // localStorage.clear(); // checking if GET works
 // allCryptoCoins.clear(); // checking if GET works
 
@@ -64,7 +114,6 @@ if (nowTime.getTime() >= refreshHolder){
 // } else showCoins(allCryptoCoins);
 
 resetAllCryptoCoins = () => {
-    // allCryptoCoins = [];
     allCryptoCoins.length = 0;
     console.log("Data was Just Deleted for an Update");
 };
@@ -84,13 +133,12 @@ function AllCoinsDataValidation (data){
     localStorage.setItem("allCryptoCoins", JSON.stringify(allCryptoCoins));
 };
 
-console.log(allCryptoCoins);
+// console.log(allCryptoCoins);
 
-// Coin Injection to the Screen
+// --- Coin Home Page ---
 function showCoins (){
-    // console.log(allCryptoCoins);
+// Coin Injection to the Screen
 for (let count = 0; count <= coinsToShow; count++){
-//!!!!!!! MISSING in SWITCH -> ${cryptoCoins.find(coin => coin.symbol === searchValue).picked ? 'checked' : ''}
 $("#coinsHomeDivRow").append(`
     <div class="card col-md-4 col-xl-4 col-lg-4 col-sm-12">
         <div class="mx-2 mt-2 d-flex justify-content-between">
@@ -102,7 +150,7 @@ $("#coinsHomeDivRow").append(`
         <div class="card-body">
             <p class="card-text">${allCryptoCoins[count].coinName}</p>
             <div class="text-center">
-                <button type="button" id="${allCryptoCoins[count].coinId}" class="moreInfo btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button type="button" class="moreInfo btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     More Info
                 </button>
             </div>
@@ -111,7 +159,6 @@ $("#coinsHomeDivRow").append(`
 `);
 };
 };
-// showCoins();
 
 // ******************************************************************
 
@@ -120,7 +167,6 @@ class ToggleCoin {
     constructor(obj, toggle){
         this.coinId = obj.coinId;
         this.coinSymbol = obj.coinSymbol;
-        // this.coinName = coinName;
         this.toggle = toggle;
     }
 };
@@ -131,7 +177,6 @@ if (pickedCoins === null){
     pickedCoins = [];
 };
 
-// saveAllData();
 // Save All Data - Both Arrays
 saveAllData = () => {
 localStorage.setItem('pickedCoins', JSON.stringify(pickedCoins));
@@ -151,7 +196,8 @@ const pickedCoinsModal = new bootstrap.Modal("#pickedCoinsModal");
 const modalOfToggles = $("#pickedCoinsModal");
 
 // Toggle Button handler
-$(".allCoinsCheckBox").change(function(){
+    // $(".allCoinsCheckBox").change(function(){  // Not Global Scope
+$(document).on("change", ".allCoinsCheckBox", function() { // On Global Scope
     let picked = $(this).attr("name"); // coinId - DOM Reference Value
     let pickedCoin = allCryptoCoins.find(coin => coin.coinId === picked); // First Object from Array
     pickedCoin.toggle = !pickedCoin.toggle; // All Coins Toggle Switching
@@ -159,17 +205,14 @@ $(".allCoinsCheckBox").change(function(){
     console.log("all toggled coins array",pickedCoins);
 
     if (!pickedCoin.toggle){ // If The Toggle Was On => Remove & Delete it
-        // console.log("i exist", pickedCoin.toggle);
         deletePickedCoin(picked); // Remove & Delete it
         } else { // If Not => Insert Toggled Coin into Array
-            // console.log("passed me");
-            pickedCoins.push(new ToggleCoin(pickedCoin, true)); // Insert Toggled Coin into Array
+            pickedCoins.push(new ToggleCoin(pickedCoin, true));
             }
     if (pickedCoins.length > 5){ // If Array 5+ => Open The Modal
         pickedCoinsRemoveModal(); // Modal Open
         } 
-        // Save Changes
-        saveAllData();
+        saveAllData();  // Save Changes
 });
 
 
@@ -178,13 +221,10 @@ pickedCoinsModalBtnFnc = (modalElement) => {
     console.log("im pressed", modalElement);
     let picked = modalElement.name; //coinId <----------
     console.log("picked", picked);
-
-    // let pickedCoin = pickedCoins.find(coin => coin.coinId === picked);
-    // console.log("an object retrieved after the selection ",pickedCoin);
     deletePickedCoin(picked);
 };
 
-// Toggles Deletion Of : AllCoins Array & PickedCoins Array
+    // Toggles Deletion Of : AllCoins Array & PickedCoins Array
 function deletePickedCoin(picked){
     pickedCoins = pickedCoins.filter(coin => coin.coinId !== picked); // Returns A New Array Without The "picked" Coin
     let pickedCoin = allCryptoCoins.find(coin => coin.coinId === picked); // Point The Coin in AllCoins array
@@ -194,7 +234,7 @@ function deletePickedCoin(picked){
     location.reload(true);
 };
 
-// Removal Modal
+    // Removal Modal
 function pickedCoinsRemoveModal (){
         // Modal Opening for deselection
         pickedCoinsModal.show(modalOfToggles);
@@ -202,7 +242,6 @@ function pickedCoinsRemoveModal (){
         $(".picked-modal-body").html(``); //Cleanup
         for (let item of pickedCoins){
             // console.log("item of pickedCoins ",pickedCoins[item]);
-            // console.log("im the modal body items ",item);
             $(".picked-modal-body").append(`
             <div class="card col-10">
             <div class="mx-2 my-2 d-flex justify-content-between">
@@ -219,83 +258,72 @@ $("#pickedCoinsAbort").on("click", function() {
     deletePickedCoin(picked.coinId); // Delete the last Item & Refresh
 });
 
-
 // Search Bar Button Handling - Showing Searched Coin
 $("#myForm").submit(function(event){
+    // console.log(event);
     event.preventDefault();
-    // event.stopPropagation();
-    $("#coinsHomeDivRow").empty();
-let searchedValue = $("#searchCoin").val().toString().toLowerCase()
-// checking if too short - validation
-if  (searchedValue.length <= 2){
-    console.log("to short :",searchedValue);
-    return;
-} 
+    // $("#coinsHomeDivRow").empty();
+    let searchedValue = $("#searchCoin").val().toString().toLowerCase()
+    // checking if too short - validation
+    if  (searchedValue.length <= 2){
+        console.log("to short :",searchedValue);
+        return;
+    } 
 
-/////// need to check DOM!!
-// push searched coins into an array
-let searchedCoinsArray = [];
-for (let coin of allCryptoCoins){
-    if (coin.coinSymbol.toString().toLowerCase() === searchedValue){
-        searchedCoinsArray.push(coin);
+    /////// need to check DOM!!
+    // push searched coins into an array
+    let searchedCoinsArray = [];
+    for (let coin of allCryptoCoins){
+        if (coin.coinSymbol.toString().toLowerCase() === searchedValue){
+            searchedCoinsArray.push(coin);
+        };
     };
-};
-// Inject coins after search
-searchedCoinDisplay (searchedCoinsArray);
+    // Inject coins after search
+    searchedCoinDisplay (searchedCoinsArray);
 });
 
-// Display the searched coins
+    // Display the searched coins
 function searchedCoinDisplay (searchedCoinsArray) {
-// coins injection from saved search array
-if (searchedCoinsArray){
-// $("#coinsHomeDivRow").empty();
-for (let coin of searchedCoinsArray){
-    console.log(coin);
-    // $("#coinsHomeDivRow").empty()
-        $("#coinsHomeDivRow").append(`
-    <div class="card col-md-4 col-xl-4 col-lg-4 col-sm-12">
-        <div class="mx-2 mt-2 d-flex justify-content-between">
-            <h5 class="card-title">${coin.coinSymbol.toUpperCase()}</h5>
-            <div class="form-check form-switch">
-                <input class="form-check-input allCoinsCheckBox" name="${coin.coinId}" type="checkbox" role="switch" ${coin.toggle ? "checked" : ""}>
+    // coins injection from saved search array
+    if (searchedCoinsArray){
+    $("#coinsHomeDivRow").empty();
+    for (let coin of searchedCoinsArray){
+        console.log("Searched-Coins Array: ",coin);
+        // $("#coinsHomeDivRow").empty()
+            $("#coinsHomeDivRow").append(`
+        <div class="card col-md-4 col-xl-4 col-lg-4 col-sm-12">
+            <div class="mx-2 mt-2 d-flex justify-content-between">
+                <h5 class="card-title">${coin.coinSymbol.toUpperCase()}</h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input allCoinsCheckBox" name="${coin.coinId}" type="checkbox" role="switch" ${coin.toggle ? "checked" : ""}>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text">${coin.coinName}</p>
+                <div class="text-center">
+                    <button type="button" class="moreInfo btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        More Info
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <p class="card-text">${coin.coinName}</p>
-            <div class="text-center">
-                <button type="button" id="${coin.coinId}" class="moreInfo btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    More Info
-                </button>
-            </div>
-        </div>
-    </div>
-`);
+        `);
+    };
+    };
 };
-};
-};
-
-// need to fix - MORE INFO BTN - NOT WORKING after search!!!!!!
 
 // MoreInfo Modal
 const moreInfoModal = new bootstrap.Modal("#exampleModal");
 const modalToggle = $("#exampleModal");
 
-// More Info event Handler
-$(".moreInfo").on("click", function() {
-    let thisCoinId = $(this).attr("id");
-    console.log("hi: ",thisCoinId);
-    //change THIS!!!
-    console.log("inside a search");
+    // More Info event Handler
+// $(".moreInfo").on("click", function() {      // Not on Global Scope
+$(document).on("click", ".moreInfo", function() { // On Global Scope
     let symbol = $(this).parent().parent().parent().children(":first-child").children(":first-child").text();
-    console.log(symbol);
-    // NEED TO CHANGE HANDLING TO SAVED COIN OR GET
-
+    // console.log(symbol);
     $("#exampleModalLabel").text(symbol.toUpperCase());
-    let coin = allCryptoCoins.find(coin => coin.coinSymbol.toLowerCase() === symbol.toLowerCase())
-    console.log("searched for: ",coin);
-    //*********************** */
+    let coin = allCryptoCoins.find(coin => coin.coinSymbol.toLowerCase() === symbol.toLowerCase());
     modalCheckIfExistAndDisplay(coin.coinId);
-    //************************ */
     moreInfoModal.show(modalToggle);
 });
 
@@ -319,9 +347,6 @@ class SavedCoin {
         this.coinEUR = obj.market_data.current_price.eur
         this.coinILS = obj.market_data.current_price.ils
         }
-        // function cleanUp = this.delete();
-        //add cleanup Function of timer that gets a val (2 minutes)
-        // and activate the function from outside the class
     }
 
     // Checking if data was saved, if not, GET new data
@@ -347,10 +372,7 @@ function modalGetData (coinId){
         },
         success: (data) => {
             saveACoin(data, coinId);
-            // savedCoins.push(new SavedCoin (data, coinId));
-            // savedCoins.push(data);
-            // console.log("inside: ",savedCoins);
-
+            
             // Re-Handle Received Data
             modalCheckIfExistAndDisplay(coinId);    // Re-Handle Received Data
         }
@@ -367,10 +389,12 @@ function saveACoin(data, coinId){
 console.log(savedCoins);
 
 // Delete Coin details after "timerForDeleteSavedCoin" -2 min-
-// setInterval(() => {
-//      savedCoins.length = 0
-//      localStorage.removeItem("savedCoins");
-//   }, timerForDeleteSavedCoin);
+var savedDataInterval = setInterval(() => {
+        savedCoins.length = 0
+        localStorage.removeItem("savedCoins");
+    }, timerForDeleteSavedCoin);
+
+    // clearInterval(savedDataInterval);
 
 // More Info Modal
 function modalInjectBody(data) {
@@ -391,69 +415,23 @@ function modalInjectBody(data) {
     };
 };
 
+    // Toggled Coins will be inserted below!
+var selectedCoins = [];
+    // var selectedCoins = ["ETH","BTC","BNB","SOL","XRP"]; // Example
+for (let coin of pickedCoins){
+    // console.log("Symbol: ", coin.coinSymbol);
+    selectedCoins.push(coin.coinSymbol);
+    // console.log("Symbols: ", selectedCoins);
+};
 
 
-
-console.log("Saved Coin - Live Chart Data: ", pickedCoins);
-// Need pickedCoins => coinSymbol
-
-// Toggled Coins will be inserted below!
-
-
-// Data handling to give for Live Chart
-// var selectedCoins = "ETH,BTC,BNB,SOL,XRP";
-var selectedCoins = ["ETH","BTC","BNB","SOL","XRP"];
-var selectedCurrency = "USD";
-// var res="";
+var selectedCurrency = "USD"; // Currency to Display
 const LiveCoinsURL = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${selectedCoins}&tsyms=${selectedCurrency}`;
 
+// console.log("Selected Coins: ",selectedCoins);
 
-// Data Receiving - liveCoinData
-var liveCoinData = $.getJSON(LiveCoinsURL,res=>{
-    console.log("Data Received :",res);
-    liveDataHandler(res);
-    
-    // console.log(`${res[selectedCoins[0]][selectedCurrency]}`);
-});
-
-//working!!!!!!!!!!!!!!!
-// console.log(liveCoinData);
-// console.log(res);
-liveDataHandler = (res) => {
-    for (item in res){
-        // console.log(`${liveCoinData[item]}`);
-        // console.log(item);
-        // console.log(liveCoinData);
-    };
-};
-
-// liveDataHandler = (liveCoinData) => {
-//     for (item in liveCoinData){
-//         console.log(`${liveCoinData[item]}`);
-
-//     };
-// };
-
-dataPointsMaker = (selectedCoins) => {
-for (item in selectedCoins){
-    console.log("selected Coins Item Index: ",item+1);
-        // `var dataPoints${item} = []`
-    // return `var dataPoints${item} = []`
-    console.log("selected Coins Item: ",selectedCoins[item]);
-};
-};
-// console.log(dataPoints1);
-dataPointsMaker(selectedCoins); // <= Checking if works
-
-// Live Chart - Multi 5 coin data in 1 Chart
-window.onload = function (res) {
-
-    var dataPoints1 = [];
-    var dataPoints2 = [];
-    var dataPoints3 = [];
-    var dataPoints4 = [];
-    var dataPoints5 = [];
-    // change this to => pickedCoins.Length = dataPoints.Length
+function liveDataChartPage(selectedCoins) {
+    var dataPoints = []; // Array to hold data points for all coins
 
     var options = {
         title: {
@@ -463,7 +441,7 @@ window.onload = function (res) {
             title: "Chart updates every 2 secs"
         },
         axisY: {
-            suffix: `${selectedCurrency}`    //"Wh"
+            suffix: selectedCurrency
         },
         toolTip: {
             shared: true
@@ -475,142 +453,144 @@ window.onload = function (res) {
             fontColor: "dimGrey",
             itemclick: toggleDataSeries
         },
-        data:   [{
+        data: []
+    };
+
+// Initialize dataPoints array with empty arrays for each coin
+selectedCoins.forEach(() => {
+    dataPoints.push([]);
+})
+
+    selectedCoins.forEach((coin, index) => {
+        options.data.push({
             type: "line",
             xValueType: "dateTime",
             yValueFormatString: `###.00${selectedCurrency}`,
             xValueFormatString: "hh:mm:ss TT",
             showInLegend: true,
-            name: selectedCoins[0], //"Turbine 1",
-            dataPoints: dataPoints1
-                },
-                {
-            type: "line",
-            xValueType: "dateTime",
-            yValueFormatString: `###.00${selectedCurrency}`,
-            showInLegend: true,
-            name: selectedCoins[1],
-            dataPoints: dataPoints2
-                },
-                {
-            type: "line",
-            xValueType: "dateTime",
-            yValueFormatString: `###.00${selectedCurrency}`,
-            showInLegend: true,
-            name: selectedCoins[2],
-            dataPoints: dataPoints3
-                },
-                {
-            type: "line",
-            xValueType: "dateTime",
-            yValueFormatString: `###.00${selectedCurrency}`,
-            showInLegend: true,
-            name: selectedCoins[3],
-            dataPoints: dataPoints4
-                },
-                {
-            type: "line",
-            xValueType: "dateTime",
-            yValueFormatString: `###.00${selectedCurrency}`,
-            showInLegend: true,
-            name: selectedCoins[4],
-            dataPoints: dataPoints5
-                }]
-    };
-    
-    var chart = $("#chartContainer").CanvasJSChart(options);
-    
+            name: coin.toUpperCase(),
+            dataPoints: dataPoints[index] // Assigning dataPoints array for each coin
+        });
+    });
+
+    var chart = new CanvasJS.Chart("chartContainer", options);
+
     function toggleDataSeries(e) {
-        if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+        if (typeof e.dataSeries.visible === "undefined" || e.dataSeries.visible) {
             e.dataSeries.visible = false;
-        }
-        else {
+        } else {
             e.dataSeries.visible = true;
         }
-        e.chart.render();
-    }
-    
-    var updateInterval = 2 * 1000; // 2 seconds
-
-    // Data From GET is yValue
-
-    // initial value
-    var yValue1 = 0;
-    // var yValue1 = `${res[selectedCoins[0]][selectedCurrency]}`;
-    var yValue2 = 0;
-    var yValue3 = 0;
-    var yValue4 = 0;
-    var yValue5 = 0;
-    
-    var time = new Date;
-    // starting at 10.00 am
-    // time.setHours(10);
-    // time.setMinutes(0o0);
-    // time.setSeconds(0o0);
-    // time.setMilliseconds(0o0);
-    
-    function updateChart(count) {
-        count = count || 1;
-            // Generate Code Here!!!!!!!
-
-    
-        var deltaY1, deltaY2, deltaY3, deltaY4, deltaY5;
-        for (var i = 0; i < count; i++) {
-            time.setTime(time.getTime() + updateInterval);
-            deltaY1 = -1 + Math.random() * (1 + 1);
-            deltaY2 = -1 + Math.random() * (1 + 1);
-            deltaY3 = -1 + Math.random() * (1 + 1);
-            deltaY4 = -1 + Math.random() * (1 + 1);
-            deltaY5 = -1 + Math.random() * (1 + 1);
-    
-            // INSERT EACH COIN PRICE DATA IN yValue
-            // *****************************************
-            // adding random value and rounding it to two digits. 
-            yValue1 = Math.round((yValue1 + deltaY1) * 100) / 100;      //`${res[selectedCoins[0]][selectedCurrency]}`;
-            yValue2 = Math.round((yValue2 + deltaY2) * 100) / 100;
-            yValue3 = Math.round((yValue3 + deltaY3) * 100) / 100;
-            yValue4 = Math.round((yValue4 + deltaY4) * 100) / 100;
-            yValue5 = Math.round((yValue5 + deltaY5) * 100) / 100;
-    
-            // pushing the new values
-            dataPoints1.push({
-                x: time.getTime(),
-                y: yValue1
-            });
-            dataPoints2.push({
-                x: time.getTime(),
-                y: yValue2
-            });
-            dataPoints3.push({
-                x: time.getTime(),
-                y: yValue3
-            });
-            dataPoints4.push({
-                x: time.getTime(),
-                y: yValue4
-            });
-            dataPoints5.push({
-                x: time.getTime(),
-                y: yValue5
-            });
-        }
-    
-        // updating legend text with  updated with y Value 
-        options.data[0].legendText = `${selectedCoins[0]} : ${selectedCoins[0]["USD"]} ${selectedCurrency}`;      //"Turbine 1 : " + yValue1 + "Wh";
-        options.data[1].legendText = "Turbine 2 : " + yValue2 + "Wh";
-        options.data[2].legendText = "Turbine 3 : " + yValue3 + "Wh";
-        options.data[3].legendText = "Turbine 4 : " + yValue4 + "Wh";
-        options.data[4].legendText = "Turbine 5 : " + yValue5 + "Wh";
-        $("#chartContainer").CanvasJSChart().render();
-    }
-    // generates first set of dataPoints 
-    updateChart(100);
-    setInterval(function () { updateChart() }, updateInterval);
-    
+        chart.render();
     }
 
+    var updateInterval = 2000; // 2 seconds
+
+    function updateChart() {
+        $.ajax({
+            type: 'GET',
+            url: LiveCoinsURL,
+            success: function(data) {
+                selectedCoins.forEach((coin, index) => {
+                    var yValue = data[coin]?.USD || 0; // Using optional chaining and nullish coalescing operator
+                    dataPoints[index].push({
+                        x: new Date(),
+                        y: yValue
+                    });
+                    // Update legend text
+                    options.data[index].legendText = `${coin.toUpperCase()}: ${yValue ? yValue : 'N/A'}${selectedCurrency}`;
+                });
+                chart.render();
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+            }
+        });
+    }
+    updateChart(); // Initial call to fetch data
+    setInterval(updateChart, updateInterval); // Update data at regular intervals
+};
 
 
+// About Page
+var aboutMe = `
+<div class="container">
+                    
+<!-- Header -->
+<div class="row text-center">
+
+    <div class="col h3">
+        About Me Section
+        <hr>
+    </div>
+
+</div>
+
+<!-- Body -->
+<div class="row">
+
+    <!-- Picture - Left -->
+    <div class="col-sm-4">
+    <!-- Picture -->
+    <img class="myPic" src="images/MyPic.jpeg" rounded-3 my-4" alt="My Picture">
+    </div>
+
+    <!-- Body - Right -->
+    <div class="col-sm-8">
+
+        <div class="text-center h2">Matti Laufer</div>
+        <div class="text-center h3">FullStack Web Developer/Programmer</div>
+
+        <!-- Me Section -->
+            <p class="text-center">
+                <b>"There is a Solution to any Scenario"</b>
+            </p>
+
+            <p>
+                I'm Matti, 33 years old, Married to Raz.
+                Together with us is our loved dog and cat, Jasper and Leo.
+                I am really connected to the Culinary world, mushroom gathering, gardening and nature in general.
+                I also like 4X4 vehicle drives and motorcycles.
+                I grew up together with the rise of the old and modern computer games understanding many technologies on the way.
+            </p>
+        <!-- Project Section -->
+            <p>
+                As a Full Stack Web Developer,
+                I have successfully designed and implemented several projects,
+                showcasing my ability to deliver high-quality solutions.
+                I am skilled in front-end development, utilizing languages such as HTML, CSS, JavaScript, and TypeScript.
+
+                In this Project I crafted an InterActive Application,
+                Combining my knowledge of the programming languages I've learned,
+                Using the Technologies of JQuery, AJAX, BootStrap and live API calls
+                as well as a Live Chart Feature using CanvasJS.
+            </p>
+    </div>
+
+</div>
+<!-- Footer -->
+<div class="row">
+
+    <!-- GitHub - Left -->
+    <div class="col text-end">
+    <!-- GitHub -->
+        <!-- <button type="button" class="btn btn-link">GitHub</button> -->
+        <a class="btn" href="https://github.com/Matti-Laufer" role="button">
+            <img class="logoImages gitIMG" src="images/gitHubLogo.png" alt="Github-Logo">
+        </a>
+    </div>
+    
+    <!-- LinkedIn - Right -->
+    <div class="col">
+    <!-- LinkedIn -->
+        <!-- <button type="button" class="btn btn-link">LinkedIn</button> -->
+        <a class="btn" href="https://www.linkedin.com/in/matti-laufer/" role="button">
+            <img class="logoImages LinkedIMG" src="images/linkedInLogo.png" alt="LinkedIn-Logo">
+        </a>
+    </div>
+</div>
+</div>
+`;
 
 
 });
